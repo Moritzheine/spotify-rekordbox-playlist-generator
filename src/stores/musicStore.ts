@@ -56,7 +56,7 @@ export class MusicStore {
     const data = "#EXTM3U" + tracks.map(track => 
       track.toM3U8()
     ).join("")
-    console.log(data)
+    // console.log(data)
     const blob = new Blob([data]);
     const fileDownloadUrl = URL.createObjectURL(blob);
 

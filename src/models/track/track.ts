@@ -1,12 +1,12 @@
 
-export interface ITrack {
-  title?: string,
-  artist?: string,
-  duration?: number,
-  location?: string,
-}
+// export interface ITrack {
+//   title?: string,
+//   artist?: string,
+//   duration?: number,
+//   location?: string,
+// }
 
-interface ITrack2 {
+interface ITrack {
   TrackID?: string | null,
   Name: string,
   Artist?: string | null,
@@ -34,17 +34,17 @@ interface ITrack2 {
   TotalTime?: string | null
 }
 
-export default class Track implements ITrack2 {
+export default class Track implements ITrack {
   Name: string
   Artist?: string | null | undefined
   Location?: string | null | undefined
   TotalTime?: string | null | undefined
 
-  constructor(props: ITrack2) {
-    this.Name = props.Name
-    this.Artist = props.Artist
-    this.Location = props.Location
-    this.TotalTime = props.TotalTime
+  constructor({Name, Artist, Location, TotalTime}: ITrack) {
+    this.Name = Name
+    this.Artist = Artist
+    this.Location = Location
+    this.TotalTime = TotalTime
   }
 
   toM3U8(): string {

@@ -5,31 +5,30 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "rm -rf dist && export NODE_ENV=production && vite build",
     "preview": "vite preview",
-    "mytest": "node src/stores/test.js"
+    "deploy": "aws s3 cp dist s3://spotifyrekordboxconverter/ --recursive"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.10.9",
     "@mui/material": "^5.10.13",
+    "@types/node": "^18.11.9",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.9",
     "@types/react-router-dom": "^5.3.3",
-    "@types/xml2js": "^0.4.11",
+    "@types/spotify-web-api-node": "^5.0.7",
     "mobx": "^6.6.2",
     "mobx-react": "^7.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-xml-parser": "^1.1.8",
-    "spotify-web-api-node": "^5.0.2",
-    "xml2js": "^0.4.23"
+    "spotify-web-api-js": "^1.5.2",
+    "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
     "@types/eslint": "^8.4.10",
-    "@types/node": "^18.11.9",
-    "@types/react": "^18.0.24",
-    "@types/react-dom": "^18.0.8",
-    "@types/spotify-web-api-node": "^5.0.7",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "@vitejs/plugin-react": "^2.2.0",

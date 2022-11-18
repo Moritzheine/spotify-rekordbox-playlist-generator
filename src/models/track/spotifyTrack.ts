@@ -1,14 +1,11 @@
-import Track from "./track";
-
 interface ISpotifyTrack {
   spotifyUrl: string
 }
   
-export class SpotifyTrack extends Track implements ISpotifyTrack {
+export default class SpotifyTrack implements ISpotifyTrack {
   private _spotifyUrl = "";
   
   constructor({ spotifyUrl }: ISpotifyTrack) {
-    super({});
     this.spotifyUrl = spotifyUrl;
   }
 
