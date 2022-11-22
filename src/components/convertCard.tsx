@@ -8,7 +8,7 @@ const ConvertCard: FC = (): ReactElement => {
   const { musicStore, spotifyStore } = getStoreFromContext();
 
   const handleSubmit = () => {
-    spotifyStore.fetchPlaylists()
+    spotifyStore.fetchPlaylists();
   };
 
   return (
@@ -21,7 +21,7 @@ const ConvertCard: FC = (): ReactElement => {
         />
         <Button type="submit" onClick={handleSubmit}>Submit</Button>
       </Grid>
-      </>
+    </>
   );
 };
 

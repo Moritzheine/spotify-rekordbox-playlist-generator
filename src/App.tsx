@@ -1,15 +1,12 @@
-import { FC, ReactElement, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React, { FC, ReactElement } from "react";
+import "./App.css";
 import { RootStore, StoreContext } from "./stores";
 import { Main } from "./components";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-import { BrowserRouter } from "react-router-dom";
-import HeaderBar from './components/headerBar';
 
 const myTheme = createTheme({
-  typography: {
-    fontFamily: [
+  typography : {
+    fontFamily : [
       "-apple-system",
       "BlinkMacSystemFont",
       "\"Segoe UI\"",
@@ -31,7 +28,6 @@ const App: FC = (): ReactElement => {
     <StoreContext.Provider value={stores}>
       <ThemeProvider theme={myTheme}>
         <CssBaseline />
-        <HeaderBar />
         <Main />
       </ThemeProvider>
     </StoreContext.Provider>

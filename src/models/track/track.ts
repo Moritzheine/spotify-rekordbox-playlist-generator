@@ -40,14 +40,14 @@ export default class Track implements ITrack {
   Location?: string | null | undefined
   TotalTime?: string | null | undefined
 
-  constructor({Name, Artist, Location, TotalTime}: ITrack) {
-    this.Name = Name
-    this.Artist = Artist
-    this.Location = Location
-    this.TotalTime = TotalTime
+  constructor({ Name, Artist, Location, TotalTime }: ITrack) {
+    this.Name = Name;
+    this.Artist = Artist;
+    this.Location = Location;
+    this.TotalTime = TotalTime;
   }
 
   toM3U8(): string {
-    return `#EXTINF:${this.TotalTime},${this.Artist} - ${this.Name}\n${this.Location}\n`
+    return `#EXTINF:${this.TotalTime},${this.Artist} - ${this.Name}\n${this.Location}\n`;
   }
 }

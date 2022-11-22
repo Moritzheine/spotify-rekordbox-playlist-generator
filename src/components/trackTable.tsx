@@ -10,7 +10,7 @@ const TrackTable: FC = (): ReactElement => {
 
   return (
     <React.Fragment>
-      <Button onClick={() => { spotifyStore.fetchPlaylists() }}>Load Playlists</Button>
+      <Button onClick={() => { spotifyStore.fetchPlaylists(); }}>Load Playlists</Button>
       <Button onClick={() => (spotifyStore.fetchUser())}>Load User</Button>
       {spotifyStore.playlists.length === 0 ? <React.Fragment /> :
         spotifyStore.playlistsLoading ? <Loader height={100} /> :
