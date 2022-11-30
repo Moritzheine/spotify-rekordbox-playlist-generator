@@ -1,5 +1,4 @@
 import { makeAutoObservable } from "mobx";
-import Track from "../models/track/track";
 import SpotifyWebApi from "spotify-web-api-node";
 
 
@@ -8,21 +7,24 @@ export class SpotifyStore {
   private spotifyApi: SpotifyWebApi;
   private _authToken: string | undefined = undefined;
   private _playlists: SpotifyApi.PlaylistObjectSimplified[] = []
+  private _selectedPlaylistId = "";
   private _playlistsLoading = false;
   private _userLoading = false;
   private _tracksLoading = false;
   private _user: SpotifyApi.CurrentUsersProfileResponse | undefined = undefined;
   private _tokenExpiresAt = 0;
 
-  private CLIENT_ID = import.meta.env.VITE_CLIENT_ID ?? "36a41538cbcc42bc90289b235924c966"
-  private REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI ?? "https://spotifyrekordboxconverter.s3.eu-central-1.amazonaws.com/index.html"
+  private CLIENT_ID = import.meta.env.VITE_CLIENT_ID
+  private REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI
   private AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
   private RESPONSE_TYPE = "token"
+  private SCOPES = ["playlist-read-private"]
 
   constructor() {
     makeAutoObservable(this);
     this.spotifyApi = new SpotifyWebApi();
   }
+
 
   tokenExpired(): boolean {
     if (this.authToken === undefined) return true;
@@ -35,22 +37,29 @@ export class SpotifyStore {
     window.location.href = this.authUrl();
   }
 
+  logOut() {
+    this.authToken = undefined;
+    window.localStorage.removeItem("token");
+    // window.location.reload();
+  }
+
+  get loggedIn() {
+    return this.authToken === undefined;
+  }
+
   async fetchPlaylists(): Promise<void> {
     if (this.playlistsLoading) return;
     this.playlistsLoading = true;
     console.log("Fetching Playlists...");
     this.spotifyApi.getUserPlaylists()
       .then((response) => {
-        if (response.statusCode !== 200) {
-          // this.authorizeUser();
-        }
         const playlists = response.body.items;
         console.log(playlists.map((e) => e.name));
         this.playlists = playlists;
       })
       .catch((err) => {
         console.error(err);
-        // this.authorizeUser();
+        this.logOut();
       })
       .finally(() => {
         this.playlistsLoading = false;
@@ -64,16 +73,16 @@ export class SpotifyStore {
     console.log("Fetching User...");
     return this.spotifyApi.getMe()
       .then((response) => {
-        if (response.statusCode !== 200) {
-          // this.authorizeUser();
-        }
+        // if (response.statusCode !== 200) {
+        //   this.logOut();
+        // }
         const me = response.body;
         console.log(me);
         this.user = me;
       })
       .catch((err) => {
         console.error(err);
-        // this.authorizeUser();
+        this.logOut();
       })
       .finally(() => {
         this.userLoading = false;
@@ -82,19 +91,20 @@ export class SpotifyStore {
 
   async fetchPlaylistTracks(playlistId: string): Promise<void> {
     if (this.tracksLoading) return;
+    this.selectedPlaylistId = playlistId;
     this.tracksLoading = true;
     console.log("Fetching Tracks...");
     return this.spotifyApi.getPlaylistTracks(playlistId)
       .then((response) => {
-        if (response.statusCode !== 200) {
-          // this.authorizeUser();
-        }
+        // if (response.statusCode !== 200) {
+        //   this.logOut();
+        // }
         this.trackList = response.body.items.flatMap((track) => track.track ? [track.track] : []);
         console.log(this.trackList.map((t) => t.name));
       })
       .catch((err) => {
         console.error(err);
-        // this.authorizeUser();
+        this.logOut();
       })
       .finally(() => {
         this.tracksLoading = false;
@@ -106,20 +116,13 @@ export class SpotifyStore {
   }
 
   authUrl() {
-    const scopes = ["playlist-read-private", "playlist-read-collaborative", "user-read-email"],
-      state = "some-state-of-my-choice",
-      showDialog = true;
-
-    // Create the authorization URL
-    // var authorizeURL = this.spotifyApi.createAuthorizeURL(
-    //   scopes,
-    //   state,
-    //   showDialog,
-    //   // responseType
-    // ).replace("code", "token")
-    const authorizeURL = `${this.AUTH_ENDPOINT}?client_id=${this.CLIENT_ID}&redirect_uri=${this.REDIRECT_URI}&response_type=${this.RESPONSE_TYPE}`;
+    const authorizeURL = `${this.AUTH_ENDPOINT}?client_id=${this.CLIENT_ID}&response_type=${this.RESPONSE_TYPE}&redirect_uri=${this.REDIRECT_URI}&scope=${this.SCOPES.join("%20")}&show_dialog=true`;
     console.log(authorizeURL);
     return authorizeURL;
+  }
+
+  getPlaylistById(id: string) {
+    return this.playlists.find(playlist => playlist.id === id);
   }
 
   get authToken() {
@@ -184,5 +187,12 @@ export class SpotifyStore {
   }
   public set playlistsLoading(v: boolean) {
     this._playlistsLoading = v;
+  }
+
+  public get selectedPlaylistId(): string {
+    return this._selectedPlaylistId;
+  }
+  public set selectedPlaylistId(v: string) {
+    this._selectedPlaylistId = v;
   }
 }

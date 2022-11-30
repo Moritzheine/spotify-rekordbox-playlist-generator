@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "rm -rf dist && export NODE_ENV=production && vite build",
     "preview": "vite preview",
-    "deploy": "aws s3 cp dist s3://spotifyrekordboxconverter/ --recursive"
+    "deploy": "aws s3 cp dist s3://spotifyrekordboxconverter/ --recursive",
+    "testUrl": "node src/stores/test.js"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
