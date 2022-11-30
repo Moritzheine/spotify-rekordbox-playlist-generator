@@ -73,9 +73,9 @@ export class SpotifyStore {
     console.log("Fetching User...");
     return this.spotifyApi.getMe()
       .then((response) => {
-        // if (response.statusCode !== 200) {
-        //   this.logOut();
-        // }
+        if (response.statusCode !== 200) {
+          this.logOut();
+        }
         const me = response.body;
         console.log(me);
         this.user = me;
@@ -89,25 +89,48 @@ export class SpotifyStore {
       });
   }
 
-  async fetchPlaylistTracks(playlistId: string): Promise<void> {
+  async fetchPlaylist(playlistId: string): Promise<void> {
     if (this.tracksLoading) return;
+    this.selectedPlaylistId = playlistId;
     this.selectedPlaylistId = playlistId;
     this.tracksLoading = true;
     console.log("Fetching Tracks...");
-    return this.spotifyApi.getPlaylistTracks(playlistId)
+    const playlist = this.getPlaylistById(playlistId);
+    if (!playlist) {
+      return;
+    }
+    this.trackList = [];
+    console.log(`Loading ${playlist?.tracks.total} Tracks`);
+    const fetchAll = async () => {
+      for (let i = 0; i < Math.ceil(playlist?.tracks.total / 100); i++) {
+        await this.fetchPlaylistTracks(playlistId, i*100);
+      }
+    };
+    fetchAll()
+      .then(() => {
+        console.log("Tracklist: ", this.trackList.map((track) => track.name));
+        if (this.trackList.length !== playlist.tracks.total) alert("Error loading playlist tracks");
+        this.tracksLoading = false;
+      });
+
+  }
+
+  async fetchPlaylistTracks(playlistId: string, offset=0): Promise<void> {
+    await this.spotifyApi.getPlaylistTracks(playlistId, { offset: offset })
       .then((response) => {
-        // if (response.statusCode !== 200) {
-        //   this.logOut();
-        // }
-        this.trackList = response.body.items.flatMap((track) => track.track ? [track.track] : []);
-        console.log(this.trackList.map((t) => t.name));
+        if (response.statusCode !== 200) {
+          this.logOut();
+        }
+        const newTracks = response.body.items.flatMap((track) => track.track ? [track.track] : []);
+        this.trackList.push(...newTracks);
+
       })
       .catch((err) => {
         console.error(err);
         this.logOut();
       })
       .finally(() => {
-        this.tracksLoading = false;
+        // this.tracksLoading = false;
       });
   }
 
@@ -123,6 +146,10 @@ export class SpotifyStore {
 
   getPlaylistById(id: string) {
     return this.playlists.find(playlist => playlist.id === id);
+  }
+
+  getSelectedPlaylist() {
+    return this.getPlaylistById(this.selectedPlaylistId);
   }
 
   get authToken() {

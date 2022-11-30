@@ -10,7 +10,6 @@ const PlaylistTable: FC = (): ReactElement => {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <Typography variant="h6">Select a playlist:</Typography>
       {/* <Button onClick={() => { spotifyStore.fetchPlaylists(); }}>Load Playlists</Button>
       <Button onClick={() => (spotifyStore.fetchUser())}>Load User</Button> */}
       {spotifyStore.playlists.length === 0 ? <React.Fragment /> :
@@ -28,7 +27,7 @@ const PlaylistTable: FC = (): ReactElement => {
                     <TableRow
                       key={playlist.href}
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                      onClick={() => spotifyStore.fetchPlaylistTracks(playlist.id)}
+                      onClick={() => spotifyStore.fetchPlaylist(playlist.id)}
                       hover
                     >
                       <TableCell component="th" scope="row" >{playlist.name}</TableCell>
@@ -37,9 +36,6 @@ const PlaylistTable: FC = (): ReactElement => {
                 </TableBody>
               </Table>
             </TableContainer>
-            {
-              <Typography>Loaded Playlist: {spotifyStore.getPlaylistById(spotifyStore.selectedPlaylistId)?.name}</Typography>
-            }
           </>
       }
       {spotifyStore.tracksLoading ? <Loader height={100} /> : null}

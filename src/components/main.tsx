@@ -1,7 +1,7 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Collapse, Divider, Grid, Typography } from "@mui/material";
 import { spacing } from "@mui/system";
 import { observer } from "mobx-react-lite";
-import React, { FC, ReactElement, useEffect } from "react";
+import React, { FC, ReactElement, useEffect, useState } from "react";
 import { getStoreFromContext } from "../helpers";
 import ContentCard from "../shared/ContentCard";
 import CollectionLoader from "./collectionLoader";
@@ -11,6 +11,8 @@ import PlaylistTable from "./playlistTable";
 
 const Main: FC = (): ReactElement => {
   const { spotifyStore } = getStoreFromContext();
+  const [playlistTableOpen, setPlaylistTableOpen] = useState(true);
+
   useEffect(() => {
     let token = window.localStorage.getItem("token");
     const hash = window.location.hash;
@@ -27,7 +29,10 @@ const Main: FC = (): ReactElement => {
     spotifyStore.authToken = token;
 
   }, []);
-  // spotifyStore.tokenExpiresAt = parseInt(queryParameters.get("expires_in") ?? "0") + new Date().getTime() / 1000;
+
+  useEffect(() => {
+    setPlaylistTableOpen(false);
+  }, [spotifyStore.selectedPlaylistId]);
 
   return (
     <div style={{ width: "100%" }}>
@@ -48,7 +53,16 @@ const Main: FC = (): ReactElement => {
                 spotifyStore.logOut();
               }}>Logout</Button>
             </Box>
-            <PlaylistTable />
+            <Typography 
+              variant="h5"
+              onClick={() => setPlaylistTableOpen(!playlistTableOpen)}
+            >
+              Select a playlist: {spotifyStore.getPlaylistById(spotifyStore.selectedPlaylistId)?.name}
+            </Typography>
+            <Divider sx={{ mb: 5 }} />
+            <Collapse in={playlistTableOpen} component="tr" style={{ display: "block" }}>
+              <PlaylistTable />
+            </Collapse>
             <CollectionLoader />
           </Box>
         }

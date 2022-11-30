@@ -10,11 +10,8 @@ const removeKeyWords = ["original", "remix", "mix", "version", "dub", "feat"];
 
 const CollectionLoader: FC = (): ReactElement => {
   const { musicStore, spotifyStore } = getStoreFromContext();
-  const [downloadUrl, setDownloadUrl] = React.useState<string | undefined>(undefined);
   const [missingTracks, setMissingTracks] = React.useState<string[]>([]);
-
   const inputFile = React.useRef<HTMLInputElement | null>(null);
-  const downloadFileLink = React.useRef<React.LegacyRef<HTMLAnchorElement> | null>(null);
 
   const stripTitle = (title: string) => {
     let newTitle = title.toLowerCase().replaceAll(" ", "").replaceAll("-", "").replaceAll("&", "").replaceAll("(", "").replaceAll(")", "").replaceAll("'", "").replaceAll(rex, "").replaceAll(".", "").normalize();
@@ -34,6 +31,9 @@ const CollectionLoader: FC = (): ReactElement => {
   };
 
   const handleCreatePlaylist = async () => {
+    if (spotifyStore.trackList.length === 0) {
+      return;
+    }
     console.log("Spotify Playlist length: ", spotifyStore.trackList.length);
     const results = spotifyStore.trackList.map((spotifyTrack) => {
       const res = {
@@ -61,36 +61,34 @@ const CollectionLoader: FC = (): ReactElement => {
     setMissingTracks(missing);
     const trackList = results.map(r => r.rekordboxTrack[0]).filter(r => r !== undefined);
     // console.log(trackList)
-    musicStore.generatePlaylist("myNewPlaylist", trackList);
+    musicStore.generatePlaylist(`spotify_${spotifyStore.getSelectedPlaylist()?.name}`, trackList);
   };
 
   return (
     <>
-      <Card>
-        <input
-          type="file"
-          ref={inputFile}
-          style={{ display: "none" }}
-          onChange={(e) => handleFileSelect(e)}
-          accept="text/xml"
-        />
-        <Button
-          onClick={() => {
-            inputFile?.current?.click();
-          }}
-        >Load Collection</Button>
-        {musicStore.trackList.length > 0 ? (
-          <>
-            <Typography>Tracks in Collection: {musicStore.trackList.length}</Typography>
-            <Button
-              onClick={() => {
-                handleCreatePlaylist();
-              }}
-            >Create Playlist</Button>
-          </>
-        ) : null}
-        <TextField multiline value={missingTracks.join("\n")} />
-      </Card>
+      <input
+        type="file"
+        ref={inputFile}
+        style={{ display: "none" }}
+        onChange={(e) => handleFileSelect(e)}
+        accept="text/xml"
+      />
+      <Button
+        onClick={() => {
+          inputFile?.current?.click();
+        }}
+      >Load Collection</Button>
+      {musicStore.trackList.length > 0 ? (
+        <>
+          <Button
+            onClick={() => {
+              handleCreatePlaylist();
+            }}
+          >Create Playlist</Button>
+          <Typography>Tracks in Collection: {musicStore.trackList.length}</Typography>
+        </>
+      ) : null}
+      <TextField multiline value={missingTracks.join("\n")} />
     </>
   );
 };
